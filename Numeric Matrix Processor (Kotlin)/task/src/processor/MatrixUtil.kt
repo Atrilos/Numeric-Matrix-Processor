@@ -2,13 +2,19 @@ package processor
 
 import java.math.BigDecimal
 
-fun inputChoice(): MenuChoice {
+fun inputMainMenuChoice(): MainMenuChoice {
     print("Your choice: ")
 
-    val choice = MenuChoice.valueOfInt(readln().toInt())
+    val choice = MainMenuChoice.valueOfInt(readln().toInt())
     println()
 
     return choice
+}
+
+fun inputTransposeMenuChoice(): TransposeMenuChoice {
+    print("Your choice: ")
+
+    return TransposeMenuChoice.valueOfInt(readln().toInt())
 }
 
 fun printMenu() {
@@ -17,6 +23,7 @@ fun printMenu() {
         1. Add matrices
         2. Multiply matrix by a constant
         3. Multiply matrices
+        4. Transpose matrix
         0. Exit
     """.trimIndent()
     )
@@ -63,6 +70,33 @@ fun multiplyMatricesRoutine() {
     val matrixB = inputMatrix(InputState.SECOND)
 
     printResult(matrixA * matrixB)
+}
+
+fun transposeRoutine() {
+    printTransposeMenu()
+    val choice = inputTransposeMenuChoice()
+    val matrix = inputMatrix(InputState.ONLY)
+
+    val transformFun: (Int, Int) -> Pair<Int, Int> = when (choice) {
+        TransposeMenuChoice.MAIN -> { x, y -> Pair(y, x) }
+        TransposeMenuChoice.SIDE -> { x, y -> Pair(matrix.n - y - 1, matrix.n - x - 1) }
+        TransposeMenuChoice.VERTICAL_LINE -> { x, y -> Pair(x, matrix.n - y - 1) }
+        TransposeMenuChoice.HORIZONTAL_LINE -> { x, y -> Pair(matrix.n - x - 1, y) }
+    }
+    val resMatrix = matrix.transpose(transformFun)
+
+    printResult(resMatrix)
+}
+
+fun printTransposeMenu() {
+    println(
+        """
+        1. Main diagonal
+        2. Side diagonal
+        3. Vertical line
+        4. Horizontal line
+    """.trimIndent()
+    )
 }
 
 fun printResult(resMatrix: Matrix) {

@@ -46,6 +46,19 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
         return Matrix(n, other.m, resArr)
     }
 
+    fun transpose(transformFun: (Int, Int) -> Pair<Int, Int>): Matrix {
+        val resArr = MutableList(m) { MutableList(n) { BigDecimal.ZERO } }
+
+        for (i in resArr.indices) {
+            for (j in resArr[i].indices) {
+                val (ni, nj) = transformFun(i, j)
+                resArr[i][j] = elementData[ni][nj]
+            }
+        }
+
+        return Matrix(m, n, resArr)
+    }
+
     private fun elementDataToMutableList(): List<MutableList<BigDecimal>> {
         return elementData.toMutableList().map { it.toMutableList() }
     }

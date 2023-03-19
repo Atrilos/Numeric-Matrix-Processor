@@ -3,11 +3,12 @@ package processor
 fun main() {
     do {
         printMenu()
-        when (inputChoice()) {
-            MenuChoice.ADD -> addMatrixRoutine()
-            MenuChoice.MULTIPLY_CONST -> multiplyConstRoutine()
-            MenuChoice.MULTIPLY_MATRICES -> multiplyMatricesRoutine()
-            MenuChoice.EXIT -> break
+        when (inputMainMenuChoice()) {
+            MainMenuChoice.ADD -> addMatrixRoutine()
+            MainMenuChoice.MULTIPLY_CONST -> multiplyConstRoutine()
+            MainMenuChoice.MULTIPLY_MATRICES -> multiplyMatricesRoutine()
+            MainMenuChoice.TRANSPOSE -> transposeRoutine()
+            MainMenuChoice.EXIT -> break
         }
     } while (true)
 }
