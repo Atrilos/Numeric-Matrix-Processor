@@ -46,8 +46,8 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
         return Matrix(n, other.m, resArr)
     }
 
-    fun transpose(transformFun: (Int, Int) -> Pair<Int, Int>): Matrix {
-        val resArr = MutableList(m) { MutableList(n) { BigDecimal.ZERO } }
+    fun transpose(transformFun: (Int, Int) -> Pair<Int, Int>, nn: Int, mm: Int): Matrix {
+        val resArr = MutableList(nn) { MutableList(mm) { BigDecimal.ZERO } }
 
         for (i in resArr.indices) {
             for (j in resArr[i].indices) {
@@ -59,8 +59,48 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
         return Matrix(m, n, resArr)
     }
 
-    private fun elementDataToMutableList(): List<MutableList<BigDecimal>> {
-        return elementData.toMutableList().map { it.toMutableList() }
+    fun determinant(): BigDecimal {
+        require(n == m) { "Can't find determinant for non-square matrix"}
+
+        fun determinantHelper(matrix: MutableList<MutableList<BigDecimal>>, size: Int): BigDecimal {
+            var res: BigDecimal = BigDecimal.ZERO
+
+            if (size == 1) return matrix[0][0]
+
+            val temp = MutableList(size) {MutableList(size) {BigDecimal.ZERO} }
+            var sign = BigDecimal.ONE
+
+            fun getCofactor(q: Int) {
+                var i = 0
+                var j = 0
+
+                for (row in 0 until size) {
+                    for (col in 0 until size) {
+                        if (row != 0 && col != q) {
+                            temp[i][j++] = matrix[row][col]
+                            if (j == size - 1) {
+                                j = 0
+                                i++
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (i in 0 until size) {
+                getCofactor(i)
+                res += sign * matrix[0][i] * determinantHelper(temp, size - 1)
+                sign = -sign
+            }
+
+            return res
+        }
+
+        return determinantHelper(elementDataToMutableList(), n)
+    }
+
+    private fun elementDataToMutableList(): MutableList<MutableList<BigDecimal>> {
+        return elementData.toMutableList().map { it.toMutableList() } as MutableList
     }
 
     override fun toString(): String {

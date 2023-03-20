@@ -24,6 +24,7 @@ fun printMenu() {
         2. Multiply matrix by a constant
         3. Multiply matrices
         4. Transpose matrix
+        5. Calculate a determinant
         0. Exit
     """.trimIndent()
     )
@@ -77,15 +78,40 @@ fun transposeRoutine() {
     val choice = inputTransposeMenuChoice()
     val matrix = inputMatrix(InputState.ONLY)
 
-    val transformFun: (Int, Int) -> Pair<Int, Int> = when (choice) {
-        TransposeMenuChoice.MAIN -> { x, y -> Pair(y, x) }
-        TransposeMenuChoice.SIDE -> { x, y -> Pair(matrix.n - y - 1, matrix.n - x - 1) }
-        TransposeMenuChoice.VERTICAL_LINE -> { x, y -> Pair(x, matrix.n - y - 1) }
-        TransposeMenuChoice.HORIZONTAL_LINE -> { x, y -> Pair(matrix.n - x - 1, y) }
+    val transformFun: (Int, Int) -> Pair<Int, Int>
+    val newN: Int
+    val newM: Int
+    when (choice) {
+        TransposeMenuChoice.MAIN -> {
+            transformFun = { x, y -> Pair(y, x) }
+            newN = matrix.m
+            newM = matrix.n
+        }
+        TransposeMenuChoice.SIDE -> {
+            transformFun = { x, y -> Pair(matrix.n - y - 1, matrix.m - x - 1) }
+            newN = matrix.m
+            newM = matrix.n
+        }
+        TransposeMenuChoice.VERTICAL_LINE -> {
+            transformFun = { x, y -> Pair(x, matrix.m - y - 1) }
+            newN = matrix.n
+            newM = matrix.m
+        }
+        TransposeMenuChoice.HORIZONTAL_LINE -> {
+            transformFun = { x, y -> Pair(matrix.n - x - 1, y) }
+            newN = matrix.n
+            newM = matrix.m
+        }
     }
-    val resMatrix = matrix.transpose(transformFun)
+    val resMatrix = matrix.transpose(transformFun, newN, newM)
 
     printResult(resMatrix)
+}
+
+fun determinantRoutine() {
+    val matrix = inputMatrix(InputState.ONLY)
+
+    printResult(matrix.determinant())
 }
 
 fun printTransposeMenu() {
@@ -102,4 +128,9 @@ fun printTransposeMenu() {
 fun printResult(resMatrix: Matrix) {
     println("The result is:")
     println(resMatrix)
+}
+
+fun printResult(result: BigDecimal) {
+    println("The result is:")
+    println(result)
 }
