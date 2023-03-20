@@ -25,6 +25,7 @@ fun printMenu() {
         3. Multiply matrices
         4. Transpose matrix
         5. Calculate a determinant
+        6. Inverse matrix
         0. Exit
     """.trimIndent()
     )
@@ -87,23 +88,26 @@ fun transposeRoutine() {
             newN = matrix.m
             newM = matrix.n
         }
+
         TransposeMenuChoice.SIDE -> {
             transformFun = { x, y -> Pair(matrix.n - y - 1, matrix.m - x - 1) }
             newN = matrix.m
             newM = matrix.n
         }
+
         TransposeMenuChoice.VERTICAL_LINE -> {
             transformFun = { x, y -> Pair(x, matrix.m - y - 1) }
             newN = matrix.n
             newM = matrix.m
         }
+
         TransposeMenuChoice.HORIZONTAL_LINE -> {
             transformFun = { x, y -> Pair(matrix.n - x - 1, y) }
             newN = matrix.n
             newM = matrix.m
         }
     }
-    val resMatrix = matrix.transpose(transformFun, newN, newM)
+    val resMatrix = matrix.transpose(newN, newM, transformFun)
 
     printResult(resMatrix)
 }
@@ -112,6 +116,16 @@ fun determinantRoutine() {
     val matrix = inputMatrix(InputState.ONLY)
 
     printResult(matrix.determinant())
+}
+
+fun inverseRoutine() {
+    val matrix = inputMatrix(InputState.ONLY)
+
+    try {
+        printResult(matrix.inverse())
+    } catch (e: IllegalArgumentException) {
+        println(e.message)
+    }
 }
 
 fun printTransposeMenu() {

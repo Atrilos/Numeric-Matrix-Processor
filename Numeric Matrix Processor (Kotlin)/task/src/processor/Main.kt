@@ -9,7 +9,9 @@ fun main() {
             MainMenuChoice.MULTIPLY_MATRICES -> multiplyMatricesRoutine()
             MainMenuChoice.TRANSPOSE -> transposeRoutine()
             MainMenuChoice.DETERMINANT -> determinantRoutine()
+            MainMenuChoice.INVERSE -> inverseRoutine()
             MainMenuChoice.EXIT -> break
         }
     } while (true)
 }
+

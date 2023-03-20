@@ -10,6 +10,7 @@ enum class MainMenuChoice(val num: Int) {
     MULTIPLY_MATRICES(3),
     TRANSPOSE(4),
     DETERMINANT(5),
+    INVERSE(6),
     EXIT(0);
 
     companion object {

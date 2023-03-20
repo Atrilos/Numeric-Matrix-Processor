@@ -1,6 +1,7 @@
 package processor
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>>) {
 
@@ -46,7 +47,7 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
         return Matrix(n, other.m, resArr)
     }
 
-    fun transpose(transformFun: (Int, Int) -> Pair<Int, Int>, nn: Int, mm: Int): Matrix {
+    fun transpose(nn: Int, mm: Int, transformFun: (Int, Int) -> Pair<Int, Int>): Matrix {
         val resArr = MutableList(nn) { MutableList(mm) { BigDecimal.ZERO } }
 
         for (i in resArr.indices) {
@@ -60,43 +61,31 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
     }
 
     fun determinant(): BigDecimal {
-        require(n == m) { "Can't find determinant for non-square matrix"}
+        require(n == m) { "Can't find determinant for non-square matrix" }
 
-        fun determinantHelper(matrix: MutableList<MutableList<BigDecimal>>, size: Int): BigDecimal {
-            var res: BigDecimal = BigDecimal.ZERO
-
-            if (size == 1) return matrix[0][0]
-
-            val temp = MutableList(size) {MutableList(size) {BigDecimal.ZERO} }
-            var sign = BigDecimal.ONE
-
-            fun getCofactor(q: Int) {
-                var i = 0
-                var j = 0
-
-                for (row in 0 until size) {
-                    for (col in 0 until size) {
-                        if (row != 0 && col != q) {
-                            temp[i][j++] = matrix[row][col]
-                            if (j == size - 1) {
-                                j = 0
-                                i++
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (i in 0 until size) {
-                getCofactor(i)
-                res += sign * matrix[0][i] * determinantHelper(temp, size - 1)
-                sign = -sign
-            }
-
-            return res
+        if (n == 1) {
+            return elementData[0][0]
         }
 
-        return determinantHelper(elementDataToMutableList(), n)
+        var determinant = BigDecimal.ZERO
+        for (col in 0 until m) {
+            val sign = if (col % 2 == 0) BigDecimal.ONE else -BigDecimal.ONE
+            determinant += sign * elementData[0][col] * getSubMatrix(0, col).determinant()
+        }
+
+        return determinant
+    }
+
+    private fun getSubMatrix(row: Int, col: Int): Matrix {
+        val resArr = MutableList(n - 1) { MutableList(m - 1) { BigDecimal.ZERO } }
+
+        for (i in 0 until n - 1) {
+            for (j in 0 until m - 1) {
+                resArr[i][j] = elementData[if (i >= row) i + 1 else i][if (j >= col) j + 1 else j]
+            }
+        }
+
+        return Matrix(n - 1, m - 1, resArr)
     }
 
     private fun elementDataToMutableList(): MutableList<MutableList<BigDecimal>> {
@@ -111,5 +100,28 @@ data class Matrix(val n: Int, val m: Int, val elementData: List<List<BigDecimal>
         }
 
         return sb.toString()
+    }
+
+    fun inverse(): Matrix {
+        val det = determinant()
+
+        require(det != BigDecimal.ZERO) { "This matrix doesn't have an inverse." }
+
+        val cofactorMatrix = MutableList(n) { MutableList(m) { BigDecimal.ZERO } }
+
+        for (i in 0 until n) {
+            for (j in 0 until m) {
+                val sign = if ((i + j) % 2 == 0) BigDecimal.ONE else -BigDecimal.ONE
+                val cofactorComponent = sign * getSubMatrix(i, j).determinant()
+                cofactorMatrix[i][j] = (
+                        (if (cofactorComponent.scale() < 2)
+                            cofactorComponent.setScale(2, RoundingMode.HALF_UP)
+                        else
+                            cofactorComponent).divide(det, RoundingMode.HALF_UP))
+                    .stripTrailingZeros()
+            }
+        }
+
+        return Matrix(n, m, cofactorMatrix).transpose(m, n) { x, y -> Pair(y, x) }
     }
 }
