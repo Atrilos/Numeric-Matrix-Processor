@@ -49,7 +49,7 @@ output
 
 ## Stage 3
 
-Multiply matrix with another matrix
+Multiply the matrix with another matrix
 
 ```
 1. Add matrices
